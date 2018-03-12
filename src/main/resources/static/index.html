@@ -17,7 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
 <html>
     <head>
-        <title>TODO supply a title</title>
+        <title>Canvas Stomp</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <script src="/webjars/jquery/jquery.min.js"></script>
@@ -30,9 +30,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
     
     <body onload="app.init()">
-        X:<input id="x" type="number"/>
-        Y:<input id="y" type="number"/>        
-        <button onclick="app.publishPoint($('#x').val(),$('#y').val())">Send point</button>
-        <canvas id="canvas" width="800" height="600"></canvas>
+        <h1>CANVAS EDITOR</h1>
+       <!-- X:<input id="x" type="number"/>
+        Y:<input id="y" type="number"/>
+        <button onclick="app.publishPoint(event)">Send point</button>-->
+        <canvas id="canvas" width="800" height="600" onclick="app.publishPoint(event)"></canvas>
     </body>
 </html>
