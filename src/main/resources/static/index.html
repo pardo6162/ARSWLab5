@@ -29,8 +29,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
     
-    <body onload="app.init()">
+    <body>
         <h1>CANVAS EDITOR</h1>
+        Enter the ID of the drawing <input id="idD"  type="number"/>
+        <button onclick="app.init($('#idD').val())">Connect</button>
        <!-- X:<input id="x" type="number"/>
         Y:<input id="y" type="number"/>
         <button onclick="app.publishPoint(event)">Send point</button>-->
