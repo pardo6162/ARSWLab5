@@ -64,7 +64,7 @@ var app = (function () {
             var pt=new Point(px,py);
             console.info("publishing point at "+pt);
             //addPointToCanvas(pt);
-            stompClient.send("/topic/newpoint",{},JSON.stringify(pt));
+            stompClient.send("/app/newpoint",{},JSON.stringify(pt));
 
             //publicar el evento
         },
