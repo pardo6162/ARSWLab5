@@ -11,6 +11,25 @@ var app = (function () {
     
     var stompClient = null;
 
+    var addPolygonToCanvas = function (polygon){
+        var canvas = document.getElementById("canvas");
+        var ctx = canvas.getContext("2d");
+        ctx.fillStyle ='#f00'
+        ctx.beginPath();
+        var count = 0
+        for(var  i=0; i<polygon.length;i++){
+            var point= polygon[i]
+            if (count==0){
+                ctx.moveTo(point.x,point.y);
+                count+=1;
+            }else{
+                ctx.lineTo(point.x,point.y);
+            }
+        }
+        ctx.closePath();
+        ctx.fill();
+    }
+
     var addPointToCanvas = function (point) {
         var canvas = document.getElementById("canvas");
         var ctx = canvas.getContext("2d");
@@ -43,9 +62,13 @@ var app = (function () {
             stompClient.subscribe('/topic/newpoint.'+idD, function (event) {
                 var jsonEvent = JSON.parse(event.body);
                 addPointToCanvas(jsonEvent);
-                //alert("X:"+jsonEvent.x+" Y:"+jsonEvent.y);
+            });
+            stompClient.subscribe('/topic/newpolygon.'+idD,function (event){
+                var jsonEvent = JSON.parse(event.body);
+                addPolygonToCanvas(jsonEvent);
             });
         });
+
 
     };
     
@@ -55,7 +78,6 @@ var app = (function () {
 
         init: function (idD) {
             var can = document.getElementById("canvas");
-            
             //websocket connection
             connectAndSubscribe(idD);
         },
@@ -67,11 +89,8 @@ var app = (function () {
                 var py= point.y;
                 var pt=new Point(px,py);
                 console.info("publishing point at "+pt);
-                //addPointToCanvas(pt);
-                stompClient.send("/topic/newpoint."+idDraw,{},JSON.stringify(pt));
-
                 //publicar el evento
-
+                stompClient.send("/app/newpoint."+idDraw,{},JSON.stringify(pt));
             }
 
         },
