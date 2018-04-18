@@ -63,7 +63,7 @@
             <artifactId>jquery</artifactId>
             <version>3.1.0</version>
         </dependency>                
-            <dependency>
+         <dependency>
         <groupId>org.springframework.integration</groupId>
         <artifactId>spring-integration-amqp</artifactId>            
     </dependency>
@@ -93,9 +93,7 @@
         <groupId>io.netty</groupId>
         <artifactId>netty-handler</artifactId>
         <version>4.0.42.Final</version>
-    </dependency>
-
-                                                        
+    </dependency>                                                        
     </dependencies>
 
     <build>
