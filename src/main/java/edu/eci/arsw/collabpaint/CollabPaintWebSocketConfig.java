@@ -1,4 +1,4 @@
-    /*
+/*
  * Copyright (C) 2016 Pivotal Software, Inc.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -34,14 +34,19 @@ public class CollabPaintWebSocketConfig extends AbstractWebSocketMessageBrokerCo
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        config.enableStompBrokerRelay("/topic/").setRelayHost("127.0.0.1").setRelayPort(61613);
-        config.setApplicationDestinationPrefixes("/app");        
+        config.enableStompBrokerRelay("/topic/").setRelayHost("eagle.rmq.cloudamqp.com").setRelayPort(61613).
+                setClientLogin("nkkqrhga").
+                setClientPasscode("nBB-PkV_yQIo3IeqxFx3FcKdZDNgxJ5o ").
+                setSystemLogin("nkkqrhga").
+                setSystemPasscode("nBB-PkV_yQIo3IeqxFx3FcKdZDNgxJ5o ").
+                setVirtualHost("nkkqrhga");
+
+        config.setApplicationDestinationPrefixes("/app");
     }
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/stompendpoint").setAllowedOrigins("*").withSockJS();        
+        registry.addEndpoint("/stompendpoint").setAllowedOrigins("*").withSockJS();
     }
-    
 
 }
