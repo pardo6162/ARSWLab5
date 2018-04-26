@@ -13,6 +13,6 @@ import java.util.ArrayList;
  * @author 2115237
  */
 public interface PersistenceModel {
-    void addPoint(Point pt);    
-    ArrayList<Point> getPoligonPoints();
+    void addPoint(Point pt, String numdibujo);    
+    ArrayList<Point> getPoligonPoints(String numdibujo);
 }

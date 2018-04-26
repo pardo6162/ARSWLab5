@@ -18,14 +18,14 @@ import util.JedisUtil;
  *
  * @author 2115237
  */
-@Service
+//@Service
 public class PersistenceModelREDIS implements PersistenceModel {
 
     private List<Object> res;
     private Response<Object> luares;
 
     @Override
-    public void addPoint(Point pt) {
+    public void addPoint(Point pt,String numdibujo) {
         
         Jedis jedis;
         jedis = JedisUtil.getPool().getResource();
@@ -49,7 +49,7 @@ public class PersistenceModelREDIS implements PersistenceModel {
     }
 
     @Override
-    public ArrayList<Point> getPoligonPoints() {
+    public ArrayList<Point> getPoligonPoints(String numdibujo) {
         ArrayList<Point> polygonPoints=new ArrayList<>();
         if (((ArrayList) luares.get()).size() == 2) {
 

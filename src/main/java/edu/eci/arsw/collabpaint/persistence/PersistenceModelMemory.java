@@ -7,22 +7,35 @@ package edu.eci.arsw.collabpaint.persistence;
 
 import edu.eci.arsw.collabpaint.model.Point;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import org.springframework.stereotype.Service;
 
 /**
  *
  * @author 2115237
  */
-
+@Service
 public class PersistenceModelMemory implements PersistenceModel{
-
+    
+    ConcurrentMap<String,List> drawPoints =  new ConcurrentHashMap<>();
+    
     @Override
-    public void addPoint(Point pt) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void addPoint(Point pt,String numdibujo) {
+        if(!drawPoints.keySet().contains(numdibujo)){
+                    List<Point> points=Collections.synchronizedList(new ArrayList<Point>());
+                    drawPoints.put(numdibujo,points);
+        }
+        drawPoints.get(numdibujo).add(pt);
     }
 
     @Override
-    public ArrayList<Point> getPoligonPoints() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public ArrayList<Point> getPoligonPoints(String numdibujo) {
+        drawPoints.get(numdibujo).clear();
+        return (ArrayList) drawPoints.get(numdibujo);
+       
     }
     
 }
