@@ -17,6 +17,7 @@ import java.util.concurrent.ConcurrentMap;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import redis.clients.jedis.Jedis;
+import redis.clients.jedis.Response;
 import redis.clients.jedis.Transaction;
 import util.JedisUtil;
 
@@ -29,35 +30,49 @@ public class STOMPMessagesHandler {
 
     @Autowired
     SimpMessagingTemplate msgt;
-    ConcurrentMap<String, List> drawPoints = new ConcurrentHashMap<>();
+    
 
     @MessageMapping("/newpoint.{numdibujo}")
     public void handlePointEvent(Point pt, @DestinationVariable String numdibujo) throws Exception {
 
         Jedis jedis;
         jedis = JedisUtil.getPool().getResource();
-
+        String luaScript = "local xval,yval; \n"
+                + "if (redis.call('LLEN','x')==4) then \n"
+                + "	xval=redis.call('LRANGE','x',0,-1); 			\n"
+                + "	yval=redis.call('LRANGE','y',0,-1);\n"
+                + "	redis.call('DEL','x'); \n"
+                + "	redis.call('DEL','y'); 		\n"
+                + "	return {xval,yval}; \n"
+                + "else \n"
+                + "	return {}; \n"
+                + "end";
+        List<Object> res = new ArrayList<>();
+        Response<Object> luares;
+        jedis.watch("x", "y");
         Transaction t = jedis.multi();
-        List<Object> res = t.exec();
+        t.rpush("x", String.valueOf(pt.getX()));
+        t.rpush("y", String.valueOf(pt.getY()));
+        luares = t.eval(luaScript.getBytes(), 0, "0".getBytes());
+        res = t.exec();
+        ArrayList<Point> polygonPoints=new ArrayList<>();
+        if (((ArrayList) luares.get()).size() == 2) {
 
-        while (!res.isEmpty()) {
-            t.watch("x", "y");
-            t.rpush("x", String.valueOf(pt.getX()));
-            t.rpush("y", String.valueOf(pt.getY()));
-            res = t.exec();
-        }
-        if (!drawPoints.keySet().contains(numdibujo)) {
-            List<Point> points = Collections.synchronizedList(new ArrayList<Point>());
-            drawPoints.put(numdibujo, points);
+            for(int i=0; i<4 ;i++){
+                int x = Integer.parseInt( new String((byte[]) ((ArrayList) (((ArrayList) luares.get()).get(0))).get(i)));
+                int y = Integer.parseInt(new String((byte[]) ((ArrayList) (((ArrayList) luares.get()).get(1))).get(i)));
+                polygonPoints.add(new Point(x,y));
+            }
+            System.out.println(new String((byte[]) ((ArrayList) (((ArrayList) luares.get()).get(0))).get(0)));
         }
 
+        System.out.println("point success");
         System.out.println("Nuevo punto recibido en el servidor!:" + pt);
         msgt.convertAndSend("/topic/newpoint." + numdibujo, pt);
-        drawPoints.get(numdibujo).add(pt);
-        if (drawPoints.get(numdibujo).size() == 4) {
-            msgt.convertAndSend("/topic/newpolygon." + numdibujo, drawPoints.get(numdibujo));
-            System.out.println("Nuevo poligono recibido en el servidor: " + drawPoints.get(numdibujo));
-            drawPoints.get(numdibujo).clear();
+        System.out.printf("longitud %d %n",polygonPoints.size());
+        if (polygonPoints.size() == 4) {
+            msgt.convertAndSend("/topic/newpolygon." + numdibujo,polygonPoints);
+            System.out.println("Nuevo poligono recibido en el servidor: " + polygonPoints);
         }
         jedis.close();
     }
